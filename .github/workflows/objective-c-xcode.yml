@@ -20,72 +20,6 @@ jobs:
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
           echo $default | cat >default
           echo Using default scheme: $default
-      - name: Change Xcode Build Output Directory
-        run: |
-          mkdir -p $HOME/xcode_build_output
-          defaults write com.apple.dt.Xcode IDEBuildOperationMaxNumberOfConcurrentCompileTasks `sysctl -n hw.logicalcpu`
-          defaults write com.apple.dt.Xcode BuildSystemScheduleInherentlyParallelCommandsExclusively -bool NO
-          defaults write com.apple.dt.Xcode BuildSystemUseTaskSandbox YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode BuildSystemDiagnosticsYES
-          defaults write com.apple.dt.Xcode BuildSystemScheduleInherentlyParallelCommandsExclusively NO
-          defaults write com.apple.dt.Xcode BuildSystemUseParallelization YES
-          defaults write com.apple.dt.Xcode DistributedBuildCacheEnabled YES
-          defaults write com.apple.dt.Xcode DistributedBuildCacheUsingServer YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode ShowBuildOperationDuration YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IDEIndexDisableStateScanning YES
-          defaults write com.apple.dt.Xcode IndexerActivityShowItem YES
-          defaults write com.apple.dt.Xcode IDEIndexerActivityShowItem YES
-          echo "Xcode build output directory changed to $HOME/xcode_build_output"
       - name: Build
         env:
           scheme: ${{ 'default' }}
@@ -93,9 +27,9 @@ jobs:
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -derivedDataPath "$HOME/xcode_build_output" | xcpretty && exit ${PIPESTATUS[0]}
+          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -derivedDataPath build_output | xcpretty && exit ${PIPESTATUS[0]}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: xcode-build-output
-          path: $HOME/xcode_build_output
+          path: build_output
