@@ -20,6 +20,8 @@ jobs:
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
           echo $default | cat >default
           echo Using default scheme: $default
+      - name: Set MACOSX_DEPLOYMENT_TARGET
+        run: export MACOSX_DEPLOYMENT_TARGET=10.15
       - name: Build
         env:
           scheme: ${{ 'default' }}
@@ -27,7 +29,7 @@ jobs:
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -sdk macosx10.15 -derivedDataPath build_output | xcpretty && exit ${PIPESTATUS[0]}
+          xcodebuild clean build analyze -scheme "$scheme" -"$filetype_parameter" "$file_to_build" -derivedDataPath build_output | xcpretty && exit ${PIPESTATUS[0]}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
